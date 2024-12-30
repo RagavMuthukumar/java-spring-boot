@@ -16,21 +16,16 @@ pipeline {
         }
         stage('compile') {
             steps {
-                sh 'mvn compile'
+                sh 'mvn clean compile'
             }
         }
         stage('code analysis') {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Java-Springboot \
+                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=java-spring-boot \
                     -Dsonar.java.binaries=. \
-                    -Dsonar.projectKey=Java-Springboot'''
+                    -Dsonar.projectKey=java-spring-boot'''
                 }
-            }
-        }
-        stage('package') {
-            steps {
-                sh 'mvn package'
             }
         }
         stage('docker build') {
@@ -53,7 +48,7 @@ pipeline {
         stage('docker container') {
             steps {
                 script {
-                    sh 'docker run -itd -p 8086:8080 java-spring'
+                    sh 'docker run -itd -p 8087:8080 java-spring'
                 }
             }
         }
