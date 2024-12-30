@@ -32,7 +32,7 @@ pipeline {
             steps {
                 script {
                 sh '''
-                docker stop $(ps -q) || trur
+                docker stop $(ps -q) || true
                 docker rm $(ps -a -q) || true
                 docker rmi $(images -q) || true
                 '''
