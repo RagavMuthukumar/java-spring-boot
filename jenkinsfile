@@ -32,9 +32,9 @@ pipeline {
             steps {
                 script {
                 sh '''
-                docker stop $(ps -q) || true
-                docker rm $(ps -a -q) || true
-                docker rmi $(images -q) || true
+                docker stop $(docker ps -q) || true
+                docker rm $(docker ps -a -q) || true
+                docker rmi $(docker images -q) || true
                 '''
                 }
             }
