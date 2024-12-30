@@ -43,6 +43,7 @@ pipeline {
         stage('docker push') {
             steps {
                 script {
+                    sh 'docker login'
                     sh 'docker tag java-spring ragavmuthukumar/java-spring'
                     sh 'docker push ragavmuthukumar/java-spring'
                 }
