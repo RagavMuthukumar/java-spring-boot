@@ -28,10 +28,21 @@ pipeline {
                 }
             }
         }
+         stage('docker clean') {
+            steps {
+                script {
+                sh '''
+                docker stop $(ps -q) || trur
+                docker rm $(ps -a -q) || true
+                docker rmi $(images -q) || true
+                '''
+                }
+            }
+        }
         stage('docker build') {
             steps {
                 script {
-                    sh 'docker build -t java-spring-2 .'
+                    sh 'docker build -t java-spring .'
                 }
             }
         }
@@ -39,7 +50,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-credential', toolName: 'docker'){
-                    sh 'docker tag java-spring-2 ragavmuthukumar/java-spring'
+                    sh 'docker tag java-spring ragavmuthukumar/java-spring'
                     sh 'docker push ragavmuthukumar/java-spring'
                     }  
                 }
@@ -48,7 +59,7 @@ pipeline {
         stage('docker container') {
             steps {
                 script {
-                    sh 'docker run -itd -p 8088:8080 java-spring-2'
+                    sh 'docker run -itd -p 8088:8080 java-spring'
                 }
             }
         }
