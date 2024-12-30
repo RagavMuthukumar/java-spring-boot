@@ -4,7 +4,7 @@ def COLOR_MAP = [
 ]
 
 pipeline {
-    agent { label 'slave-1' }
+    agent any
     environment {
         SCANNER_HOME = tool 'sonarqube'
     }
