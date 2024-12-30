@@ -40,7 +40,14 @@ pipeline {
                 }
             }
         }
-
+        stage('docker push') {
+            steps {
+                script {
+                    sh 'docker tag java-spring ragavmuthukumar/java-spring'
+                    sh 'docker push ragavmuthukumar/java-spring'
+                }
+            }
+        }
         stage('docker container') {
             steps {
                 script {
@@ -52,9 +59,11 @@ pipeline {
     post {
         always {
             echo 'slack Notification.'
-            slackSend channel: '#cicd',
-            color: COLOR_MAP[currentBuild.currentResult],
-            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}"
+            slackSend(
+                channel: '#ci-cd',
+                color: COLOR_MAP[currentBuild.currentResult],
+                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}"
+            )
         }
     }
 }
