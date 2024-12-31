@@ -49,16 +49,16 @@ pipeline {
         stage('docker push') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-hub-credential'){
+                    withDockerRegistry(credentialsId: 'docker-hub-credential', toolName: 'docker'){
                     sh 'docker push ragavmuthukumar/java-spring-31-12-2024'
-                    }
+                    }  
                 }
             }
         }
         stage('docker container') {
             steps {
                 script {
-                    sh 'docker run -itd -p 8085:8080 ragavmuthukumar/java-spring-31-12-2024'
+                    sh 'docker run -itd -p 8081:8080 java-spring-31-12-2024'
                 }
             }
         }
@@ -70,6 +70,26 @@ pipeline {
                 channel: '#ci-cd',
                 color: COLOR_MAP[currentBuild.currentResult],
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}"
+            )
+        }
+        success {
+            emailext(
+                to: 'sathyaragavan.ma@gmail.com', // Replace with a valid email address
+                subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <p>Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> was successful!</p>
+                <p>Check the build details: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """
+            )
+        }
+        failure {
+            emailext(
+                to: 'sathyaragavan.ma@gmail.com', // Replace with a valid email address
+                subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <p>Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> has failed.</p>
+                <p>Check the build details: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """
             )
         }
     }
