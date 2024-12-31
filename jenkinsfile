@@ -79,12 +79,12 @@ pipeline {
                 body: """
                 <html>
                     <body style="font-family: Arial, sans-serif;">
-                        <h2 style="color:rgb(91, 185, 235);">Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> was successful!</h2>
-                        <p style="color:rgb(239, 0, 248);">The build completed successfully. You can check the details below:</p>
-                        <p style="color:rgb(123, 180, 70);">
+                        <h2 style="color: #008000;">Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> was successful!</h2>
+                        <p style="color: #32cd32;">The build completed successfully. You can check the details below:</p>
+                        <p style="color: #4682b4;">
                             <a href="${env.BUILD_URL}" style="color: #4682b4;">Click here to view the build details</a>
                         </p>
-                        <p style="color:rgb(255, 255, 255);">Great job! The build was successful.</p>
+                        <p style="color: #808080;">Great job! The build was successful.</p>
                     </body>
                 </html>
                 """,
