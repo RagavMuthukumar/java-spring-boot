@@ -49,7 +49,7 @@ pipeline {
         stage('docker push') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-hub-credential', toolName: 'docker'){
+                    withDockerRegistry(credentialsId: 'docker-hub-credential'){
                     sh 'docker push ragavmuthukumar/java-spring-31-12-2024'
                     }  
                 }
@@ -58,7 +58,9 @@ pipeline {
         stage('docker container') {
             steps {
                 script {
+                    withDockerRegistry(credentialsId: 'docker-hub-credential'){
                     sh 'docker run -itd -p 8085:8080 java-spring-31-12-2024'
+                    }
                 }
             }
         }
