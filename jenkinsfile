@@ -84,7 +84,7 @@ pipeline {
                         <p style="color:rgb(123, 180, 70);">
                             <a href="${env.BUILD_URL}" style="color: #4682b4;">Click here to view the build details</a>
                         </p>
-                        <p style="color: #808080;">Great job! The build was successful.</p>
+                        <p style="color:rgb(255, 255, 255);">Great job! The build was successful.</p>
                     </body>
                 </html>
                 """,
