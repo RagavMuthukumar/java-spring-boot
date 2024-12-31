@@ -4,7 +4,7 @@ def COLOR_MAP = [
 ]
 
 pipeline {
-    agent { label 'slave-1'}
+    agent any
     environment {
         SCANNER_HOME = tool 'sonarqube'
     }
@@ -58,7 +58,7 @@ pipeline {
         stage('docker container') {
             steps {
                 script {
-                    sh 'docker run -itd -p 8081:8080 java-spring
+                    sh 'docker run -itd -p 8081:8080 java-spring'
                 }
             }
         }
