@@ -42,7 +42,7 @@ pipeline {
         stage('docker build') {
             steps {
                 script {
-                    sh 'docker build -t ragavmuthukumar/java-spring-31-12-2024 .'
+                    sh 'docker build -t java-spring-31-12-2024 . ragavmuthukumar/java-spring-31-12-2024'
                 }
             }
         }
