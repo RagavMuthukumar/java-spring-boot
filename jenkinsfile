@@ -42,7 +42,7 @@ pipeline {
         stage('docker build') {
             steps {
                 script {
-                    sh 'docker build -t java-spring .'
+                    sh 'docker build -t java-spring ragavmuthukumar/java-spring'
                 }
             }
         }
@@ -50,7 +50,6 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-credential', toolName: 'docker'){
-                    sh 'docker tag java-spring ragavmuthukumar/java-spring'
                     sh 'docker push ragavmuthukumar/java-spring'
                     }  
                 }
