@@ -42,16 +42,14 @@ pipeline {
         stage('docker build') {
             steps {
                 script {
-                    sh 'docker build -t java-spring-31-12-2024 . ragavmuthukumar/java-spring-31-12-2024'
+                    sh 'docker build -t ragavmuthukumar/java-spring-31-12-2024 .'
                 }
             }
         }
         stage('docker push') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-hub-credential'){
                     sh 'docker push ragavmuthukumar/java-spring-31-12-2024'
-                    }  
                 }
             }
         }
@@ -59,7 +57,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-credential'){
-                    sh 'docker run -itd -p 8085:8080 java-spring-31-12-2024'
+                    sh 'docker run -itd -p 8085:8080 ragavmuthukumar/java-spring-31-12-2024'
                     }
                 }
             }
