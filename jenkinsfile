@@ -21,7 +21,7 @@ pipeline {
         }
         stage('compile') {
             steps {
-                sh 'mvn clean compile'
+                bat 'mvn clean compile'
             }
         }
         // stage('code analysis') {
@@ -36,7 +36,7 @@ pipeline {
         stage('docker clean') {
             steps {
                 script {
-                    sh '''
+                    bat '''
                     docker stop $(docker ps -q) || true
                     docker rm $(docker ps -a -q) || true
                     docker rmi $(docker images -q) || true
@@ -47,7 +47,7 @@ pipeline {
         stage('docker build') {
             steps {
                 script {
-                    sh 'docker build -t ragavmuthukumar/java-spring-31-12-2024 .'
+                    bat 'docker build -t ragavmuthukumar/java-spring-31-12-2024 .'
                 }
             }
         }
@@ -55,7 +55,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-credential', toolName: 'docker') {
-                        sh 'docker push ragavmuthukumar/java-spring-31-12-2024'
+                        bat 'docker push ragavmuthukumar/java-spring-31-12-2024'
                     }
                 }
             }
@@ -63,7 +63,7 @@ pipeline {
         stage('docker container') {
             steps {
                 script {
-                    sh 'docker run -itd -p 8081:8080 ragavmuthukumar/java-spring-31-12-2024'
+                    bat 'docker run -itd -p 8081:8080 ragavmuthukumar/java-spring-31-12-2024'
                 }
             }
         }
