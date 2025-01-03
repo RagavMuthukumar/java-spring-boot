@@ -5,12 +5,8 @@ def COLOR_MAP = [
 
 pipeline {
     agent any
-    //environment {
-      //  SCANNER_HOME = tool 'sonarqube'
-   // }
-    triggers {
-        pollSCM (* * * * *)
-        cron (* * * * *)
+    environment {
+        SCANNER_HOME = tool 'sonarqube'
     }
 
     stages {
@@ -19,24 +15,31 @@ pipeline {
                 git 'https://github.com/RagavMuthukumar/java-spring-boot.git'
             }
         }
-        stage('compile') {
+        stage('scan the file') { // Stage name should be enclosed in quotes
             steps {
-                bat 'mvn clean compile'
+                sh 'trivy fs --security-checks vuln,config java-spring-boot > file-check.html'
             }
         }
-        // stage('code analysis') {
-        //     steps {
-        //         withSonarQubeEnv('sonar-server') {
-        //             sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=java-spring-boot \
-        //             -Dsonar.java.binaries=. \
-        //             -Dsonar.projectKey=java-spring-boot'''
-        //         }
-        //     }
-        // }
+        stage('compile') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+        stage('code analysis') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh '''
+                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=java-spring-boot \
+                    -Dsonar.java.binaries=. \
+                    -Dsonar.projectKey=java-spring-boot
+                    '''
+                }
+            }
+        }
         stage('docker clean') {
             steps {
                 script {
-                    bat '''
+                    sh '''
                     docker stop $(docker ps -q) || true
                     docker rm $(docker ps -a -q) || true
                     docker rmi $(docker images -q) || true
@@ -47,7 +50,7 @@ pipeline {
         stage('docker build') {
             steps {
                 script {
-                    bat 'docker build -t ragavmuthukumar/java-spring-31-12-2024 .'
+                    sh 'docker build -t ragavmuthukumar/java-spring-3-1-2025 .'
                 }
             }
         }
@@ -55,19 +58,25 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker-hub-credential', toolName: 'docker') {
-                        bat 'docker push ragavmuthukumar/java-spring-31-12-2024'
+                        sh 'docker push ragavmuthukumar/java-spring-3-1-2025'
                     }
                 }
+            }
+        }
+        stage('scan the image') { // Stage name should be enclosed in quotes
+            steps {
+                sh 'trivy image -f table -o image-scan.html ragavmuthukumar/java-spring-3-1-2025'
             }
         }
         stage('docker container') {
             steps {
                 script {
-                    bat 'docker run -itd -p 8081:8080 ragavmuthukumar/java-spring-31-12-2024'
+                    sh 'docker run -itd -p 8081:8080 ragavmuthukumar/java-spring-3-1-2025'
                 }
             }
         }
     }
+
     post {
         always {
             echo 'slack Notification.'
@@ -77,43 +86,43 @@ pipeline {
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \nMore info at: ${env.BUILD_URL}"
             )
         }
-        // success {
-        //     emailext(
-        //         to: 'sathyaragavan.ma@gmail.com',
-        //         subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-        //         body: """
-        //         <html>
-        //             <body style="font-family: Arial, sans-serif;">
-        //                 <h2 style="color: #008000;">Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> was successful!</h2>
-        //                 <p style="color: #32cd32;">The build completed successfully. You can check the details below:</p>
-        //                 <p style="color: #4682b4;">
-        //                     <a href="${env.BUILD_URL}" style="color: #4682b4;">Click here to view the build details</a>
-        //                 </p>
-        //                 <p style="color: #808080;">Great job! The build was successful.</p>
-        //             </body>
-        //         </html>
-        //         """,
-        //         mimeType: 'text/html'
-        //     )
-        // }
-        // failure {
-        //     emailext(
-        //         to: 'sathyaragavan.ma@gmail.com', // Replace with a valid email address
-        //         subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-        //         body: """
-        //         <html>
-        //             <body style="font-family: Arial, sans-serif;">
-        //                 <h2 style="color: #ff0000;">Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> has failed!</h2>
-        //                 <p style="color: #ff6347;">Unfortunately, the build has failed. Please check the details below:</p>
-        //                 <p style="color: #4682b4;">
-        //                     <a href="${env.BUILD_URL}" style="color: #4682b4;">Click here to view the build details</a>
-        //                 </p>
-        //                 <p style="color: #808080;">Please resolve the issues to proceed with the next build.</p>
-        //             </body>
-        //         </html>
-        //         """,
-        //         mimeType: 'text/html'
-        //     )
-        // }
+        success {
+            emailext(
+                to: 'sathyaragavan.ma@gmail.com',
+                subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <html>
+                    <body style="font-family: Arial, sans-serif;">
+                        <h2 style="color: #008000;">Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> was successful!</h2>
+                        <p style="color: #32cd32;">The build completed successfully. You can check the details below:</p>
+                        <p style="color: #4682b4;">
+                            <a href="${env.BUILD_URL}" style="color: #4682b4;">Click here to view the build details</a>
+                        </p>
+                        <p style="color: #808080;">Great job! The build was successful.</p>
+                    </body>
+                </html>
+                """,
+                mimeType: 'text/html'
+            )
+        }
+        failure {
+            emailext(
+                to: 'sathyaragavan.ma@gmail.com',
+                subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <html>
+                    <body style="font-family: Arial, sans-serif;">
+                        <h2 style="color: #ff0000;">Build #${env.BUILD_NUMBER} of <b>${env.JOB_NAME}</b> has failed!</h2>
+                        <p style="color: #ff6347;">Unfortunately, the build has failed. Please check the details below:</p>
+                        <p style="color: #4682b4;">
+                            <a href="${env.BUILD_URL}" style="color: #4682b4;">Click here to view the build details</a>
+                        </p>
+                        <p style="color: #808080;">Please resolve the issues to proceed with the next build.</p>
+                    </body>
+                </html>
+                """,
+                mimeType: 'text/html'
+            )
+        }
     }
 }
